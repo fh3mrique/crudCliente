@@ -2,16 +2,18 @@ package com.pessoalProjeto.clienteCrud.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale.Category;
+import java.util.Optional;
 
-import javax.transaction.Transactional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pessoalProjeto.clienteCrud.dto.ClienteDTO;
 import com.pessoalProjeto.clienteCrud.entities.Cliente;
 import com.pessoalProjeto.clienteCrud.repositories.ClienteRepository;
+import com.pessoalProjeto.clienteCrud.services.exceptions.EntidadeNaoEncontrada;
 
 @Service
 public class ClienteService {
@@ -19,7 +21,7 @@ public class ClienteService {
 	@Autowired
 	private ClienteRepository repository;
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<ClienteDTO> findAll(){
 		
 		List<Cliente> listaCliente = repository.findAll();
@@ -33,6 +35,16 @@ public class ClienteService {
 		return listadto;
 		
 		
+	}
+
+	@Transactional(readOnly = true)
+	public ClienteDTO findById(Long id) {
+		
+		Optional<Cliente> obj = repository.findById(id);
+		
+		Cliente entidade = obj.orElseThrow(() -> new EntidadeNaoEncontrada("Entidade não encontrada"));
+		
+		return new ClienteDTO(entidade);
 	}
 	
 	
