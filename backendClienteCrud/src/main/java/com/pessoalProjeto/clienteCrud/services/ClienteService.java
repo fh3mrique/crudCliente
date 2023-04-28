@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,16 +52,46 @@ public class ClienteService {
 		
 		Cliente entidade = new Cliente();
 		
-		entidade.setName(dto.getName());
-		entidade.setBirthDate(dto.getBirthDate());
-		entidade.setCpf(dto.getCpf());
-		entidade.setChildren(dto.getChildren());
-		entidade.setIncome(dto.getIncome());
+//		entidade.setName(dto.getName());
+//		entidade.setBirthDate(dto.getBirthDate());
+//		entidade.setCpf(dto.getCpf());
+//		entidade.setIncome(dto.getIncome());
+//		entidade.setChildren(dto.getChildren());
+		
+		CopiarDtoParaEntidade(entidade, dto);
 		
 		entidade = repository.save(entidade);
 		
 		
 		return new ClienteDTO(entidade);
+	}
+
+	@Transactional
+	public ClienteDTO update(Long id, ClienteDTO dto) {
+		
+		try {
+			
+			Cliente entidade = repository.getOne(id);
+			
+			CopiarDtoParaEntidade(entidade, dto);
+			
+			entidade = repository.save(entidade);
+			
+			return new ClienteDTO(entidade);
+		}
+		
+		catch (EntityNotFoundException e) {
+			throw new EntidadeNaoEncontrada("id não encontrado");
+		}
+	}
+
+	private void CopiarDtoParaEntidade(Cliente entidade, ClienteDTO dto) {
+		entidade.setName(dto.getName());
+		entidade.setCpf(dto.getCpf());
+		entidade.setIncome(dto.getIncome());
+		entidade.setBirthDate(dto.getBirthDate());
+		entidade.setChildren(dto.getChildren());
+			
 	}
 	
 	
